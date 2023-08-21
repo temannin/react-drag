@@ -7,14 +7,9 @@ export interface DragProps {
 }
 
 const Drag = (props: DragProps) => {
-  const {
-    onDragEnd,
-    currentOver,
-    currentActive,
-    setCurrentActive,
-    coordinatesOfCursor,
-    setCoordinatesOfCursor,
-  } = useContext(DragContextWrapper);
+  const { currentActive, setCurrentActive, coordinatesOfCursor } = useContext(
+    DragContextWrapper
+  );
 
   const ref = useRef<HTMLDivElement>(null);
   const isCurrent = props.id === currentActive;
