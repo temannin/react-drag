@@ -20,7 +20,7 @@ function App() {
       >
         {items.map((item) => {
           return (
-            <Drag id={item.id}>
+            <Drag id={item.id} key={item.id}>
               <div>{item.id}</div>
             </Drag>
           );

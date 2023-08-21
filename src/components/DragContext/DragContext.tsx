@@ -1,39 +1,63 @@
 import React, { createContext, useState } from "react";
 
+export interface ICoordinates {
+  X: number;
+  Y: number;
+}
+
 export interface IDragContext {
   currentActive: string;
   setCurrentActive: React.Dispatch<React.SetStateAction<string>>;
   currentOver: string;
-  setCurrentOver?: React.Dispatch<React.SetStateAction<string>>;
-  onDragEnd(over: string): any;
+  setCurrentOver: React.Dispatch<React.SetStateAction<string>>;
+  onDragEnd(active: string, over: string): any;
   children?: React.JSX.Element[];
+  coordinatesOfCursor: ICoordinates;
+  setCoordinatesOfCursor: React.Dispatch<React.SetStateAction<ICoordinates>>;
 }
 
 export interface IDragInterface {
-  onDragEnd(over: string): any;
+  onDragEnd(active: string, over: string): any;
   children?: React.JSX.Element[];
 }
 
 export const DragContextWrapper = createContext<IDragContext>({
-  onDragEnd: () => {
-    console.error("onDragEnd not defined!");
+  onDragEnd: (active: string, over: string) => {
+    throw new Error("onDragEnd not defined!");
   },
   currentOver: "",
+  setCurrentOver: () => {},
   currentActive: "",
   setCurrentActive: () => {},
+  coordinatesOfCursor: { X: 0, Y: 0 },
+  setCoordinatesOfCursor: () => {
+    throw new Error("setCoordinates is not defined");
+  },
 });
 
 export default function DragContext(props: IDragInterface) {
   const [currentOver, setCurrentOver] = useState("");
   const [currentActive, setCurrentActive] = useState("");
 
-  document.onmouseup = (e) => {
-    setCurrentActive("");
-  };
+  const [coordinatesOfCursor, setCoordinatesOfCursor] = useState({
+    X: 0,
+    Y: 0,
+  });
 
   document.onmousemove = (e) => {
     if (currentActive !== "") {
-      console.log(e);
+      let { clientX: x, clientY: y } = e;
+      setCoordinatesOfCursor({ X: x - 10, Y: y - 10 });
+    }
+  };
+
+  document.onmouseup = (e) => {
+    if (currentActive !== "") {
+      let retValues: { active: string; over: string } = JSON.parse(
+        JSON.stringify({ active: currentActive, over: currentOver })
+      );
+      setCurrentActive("");
+      props.onDragEnd(retValues.active, retValues.over);
     }
   };
 
@@ -41,11 +65,13 @@ export default function DragContext(props: IDragInterface) {
     <div>
       <DragContextWrapper.Provider
         value={{
-          currentActive: currentActive,
+          currentActive,
           onDragEnd: props.onDragEnd,
-          currentOver: currentOver,
-          setCurrentOver: setCurrentOver,
-          setCurrentActive: setCurrentActive,
+          currentOver,
+          setCurrentOver,
+          setCurrentActive,
+          coordinatesOfCursor,
+          setCoordinatesOfCursor,
         }}
       >
         {props.children}
