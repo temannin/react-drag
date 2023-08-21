@@ -7,9 +7,12 @@ export interface DragProps {
 }
 
 const Drag = (props: DragProps) => {
-  const { currentActive, setCurrentActive, coordinatesOfCursor } = useContext(
-    DragContextWrapper
-  );
+  const {
+    currentActive,
+    setCurrentActive,
+    coordinatesOfCursor,
+    setCoordinatesOfCursor,
+  } = useContext(DragContextWrapper);
 
   const ref = useRef<HTMLDivElement>(null);
   const isCurrent = props.id === currentActive;
@@ -67,7 +70,7 @@ const Drag = (props: DragProps) => {
     return () => {
       window.removeEventListener("resize", updateElementDimensions);
     };
-  }, []); // Empty dependency array ensures this effect runs only once
+  }, []);
 
   return (
     <div
@@ -75,6 +78,7 @@ const Drag = (props: DragProps) => {
       onMouseDown={(e) => {
         e.preventDefault();
         setCurrentActive(props.id);
+        setCoordinatesOfCursor({ X: e.clientX - 10, Y: e.clientY - 10 });
       }}
       style={styling}
     >
