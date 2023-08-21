@@ -1,5 +1,7 @@
 export function move(idToMove: any, idToInsertAfter: any, items: Array<any>) {
+  if (isEmpty(idToMove, idToInsertAfter, items)) return items;
   items = JSON.parse(JSON.stringify(items));
+
   // Find the index of the element with the given ID
   let indexOfElementToMove = items.findIndex((item) => item.id === idToMove);
 
@@ -26,4 +28,16 @@ export function move(idToMove: any, idToInsertAfter: any, items: Array<any>) {
 
   // Output the updated array
   return items;
+}
+
+function isEmpty(...args: any[]) {
+  for (let index = 0; index < args.length; index++) {
+    const val = JSON.stringify(args[index]);
+
+    const result =
+      val === undefined || val == null || val.length <= 0 ? true : false;
+
+    if (result === true) return true;
+  }
+  return false;
 }

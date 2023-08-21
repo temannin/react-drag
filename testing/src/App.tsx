@@ -7,7 +7,7 @@ import { nanoid } from "nanoid";
 
 function App() {
   const [items, setItems] = useState(
-    Array.from({ length: 3 }, () => {
+    Array.from({ length: 5 }, () => {
       return { id: nanoid() };
     })
   );

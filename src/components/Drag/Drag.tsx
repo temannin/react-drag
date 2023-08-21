@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 export interface DragProps {
   children: React.JSX.Element;
-  id: string;
+  id: any;
 }
 
 const Drag = (props: DragProps) => {
@@ -20,6 +20,7 @@ const Drag = (props: DragProps) => {
 
   const ref = useRef<HTMLDivElement>(null);
   const placeholder = useRef<HTMLDivElement>(null);
+  const container = useRef<HTMLDivElement>(null);
 
   const isCurrent = props.id === currentActive;
   const [isOver, setIsOver] = useState(false);
@@ -38,11 +39,10 @@ const Drag = (props: DragProps) => {
       setIsOver(false);
     } else {
       setIsOver(
-        isPointInsideElement(coordinatesOfCursor, dimensions) ||
-          isPointInsideElement(
-            coordinatesOfCursor,
-            placeholder.current?.getBoundingClientRect()
-          )
+        isPointInsideElement(
+          coordinatesOfCursor,
+          container.current?.getBoundingClientRect()
+        )
       );
     }
   }, [coordinatesOfCursor, dimensions, currentActive]);
@@ -91,47 +91,49 @@ const Drag = (props: DragProps) => {
 
   return (
     <>
-      <motion.div
-        animate={{
-          left: coordinatesOfCursor.X,
-          top: coordinatesOfCursor.Y,
-        }}
-        transition={{ duration: 0.05 }}
-        ref={ref}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          setCoordinatesOfCursor({ X: e.clientX - 10, Y: e.clientY - 10 });
-          setCurrentActive(props.id);
-        }}
-        style={styling}
-      >
-        {props.children}
-      </motion.div>
-      {currentActive !== "" ? (
+      <div ref={container}>
         <motion.div
-          ref={placeholder}
-          initial={{
-            height: 0,
-            opacity: 0,
-          }}
           animate={{
-            opacity: 1,
-            transition: {
-              height: {
-                duration: 0.1,
-              },
-              opacity: {
-                duration: 0.25,
-                delay: 0.15,
-              },
-            },
-            borderStyle: "dashed",
-            height: initialDimensions?.height,
-            width: initialDimensions?.width,
-            backgroundColor: isOver ? "red" : "gray",
+            left: coordinatesOfCursor.X,
+            top: coordinatesOfCursor.Y,
           }}
-        ></motion.div>
-      ) : null}
+          transition={{ duration: 0.05 }}
+          ref={ref}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setCoordinatesOfCursor({ X: e.clientX - 10, Y: e.clientY - 10 });
+            setCurrentActive(props.id);
+          }}
+          style={styling}
+        >
+          {props.children}
+        </motion.div>
+        {currentActive !== "" ? (
+          <motion.div
+            ref={placeholder}
+            initial={{
+              height: 0,
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+              transition: {
+                height: {
+                  duration: 0.1,
+                },
+                opacity: {
+                  duration: 0.25,
+                  delay: 0.15,
+                },
+              },
+              borderStyle: "dashed",
+              height: initialDimensions?.height,
+              width: initialDimensions?.width,
+              backgroundColor: isOver ? "red" : "gray",
+            }}
+          ></motion.div>
+        ) : null}
+      </div>
     </>
   );
 };
