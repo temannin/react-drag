@@ -1,21 +1,22 @@
 import { useState } from "react";
 import { Drag, DragContext } from "../../src/components";
 
+import { move } from "../../src/helpers/";
+
 import { nanoid } from "nanoid";
 
 function App() {
-  const [items, setItems] = useState([
-    { id: nanoid() },
-    { id: nanoid() },
-    { id: nanoid() },
-    { id: nanoid() },
-  ]);
+  const [items, setItems] = useState(
+    Array.from({ length: 3 }, () => {
+      return { id: nanoid() };
+    })
+  );
 
   return (
     <>
       <DragContext
-        onDragEnd={(e) => {
-          console.log(e);
+        onDragEnd={(active, over) => {
+          setItems(move(active, over, items));
         }}
       >
         {items.map((item) => {
