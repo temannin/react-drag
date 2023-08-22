@@ -104,6 +104,14 @@ const Drag = (props: DragProps) => {
             setCoordinatesOfCursor({ X: e.clientX - 10, Y: e.clientY - 10 });
             setCurrentActive(props.id);
           }}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            setCoordinatesOfCursor({
+              X: e.targetTouches[0].clientX - 10,
+              Y: e.targetTouches[0].clientY - 10,
+            });
+            setCurrentActive(props.id);
+          }}
           style={styling}
         >
           {props.children}
@@ -131,7 +139,9 @@ const Drag = (props: DragProps) => {
               width: initialDimensions?.width,
               backgroundColor: isOver ? "red" : "gray",
             }}
-          ></motion.div>
+          >
+            {props.id}
+          </motion.div>
         ) : null}
       </div>
     </>

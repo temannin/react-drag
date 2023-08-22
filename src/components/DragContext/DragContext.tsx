@@ -51,6 +51,14 @@ export default function DragContext(props: IDragInterface) {
     }
   };
 
+  document.ontouchmove = (e) => {
+    console.log(e);
+    if (currentActive !== "") {
+      let { pageX: x, pageY: y } = e.targetTouches[0];
+      setCoordinatesOfCursor({ X: x - 10, Y: y - 10 });
+    }
+  };
+
   document.onmouseup = (e) => {
     if (currentActive !== "") {
       let retValues: { active: string; over: string } = JSON.parse(
@@ -61,8 +69,18 @@ export default function DragContext(props: IDragInterface) {
     }
   };
 
+  document.ontouchend = (e) => {
+    if (currentActive !== "") {
+      let retValues: { active: string; over: string } = JSON.parse(
+        JSON.stringify({ active: currentActive, over: currentOver })
+      );
+      setCurrentActive("");
+      props.onDragEnd(retValues.active, retValues.over);
+    }
+  };
+
   return (
-    <div>
+    <div style={{ touchAction: "none" }}>
       <DragContextWrapper.Provider
         value={{
           currentActive,
