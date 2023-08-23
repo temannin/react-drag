@@ -23,7 +23,6 @@ const Drag = (props: DragProps) => {
   const container = useRef<HTMLDivElement>(null);
 
   const isCurrent = props.id === currentActive;
-  const [isOver, setIsOver] = useState(false);
 
   const updateElementDimensions = () => {
     if (ref.current) {
@@ -34,34 +33,22 @@ const Drag = (props: DragProps) => {
   const [dimensions, setDimensions] = useState<DOMRect>();
   const [initialDimensions, setInitialDimensions] = useState<DOMRect>();
 
-  useEffect(() => {
-    if (currentActive === "") {
-      setIsOver(false);
-    } else {
-      setIsOver(
-        isPointInsideElement(
-          coordinatesOfCursor,
-          container.current?.getBoundingClientRect()
-        )
-      );
-    }
-  }, [coordinatesOfCursor, dimensions, currentActive]);
-
-  useEffect(() => {
-    if (isOver) {
-      setCurrentOver(props.id);
-    }
-  }, [isOver]);
-
   const commonStyles: React.CSSProperties = {
-    border: `8px solid red`,
+    boxShadow:
+      "0 0 0 calc(1px / var(--scale-x, 1)) rgba(63, 63, 68, 0.05), 0 1px calc(3px / var(--scale-x, 1)) 0 rgba(34, 33, 81, 0.15)",
     margin: 4,
+    padding: "18px 20px",
+    backgroundColor: "#fff",
+    // left: coordinatesOfCursor.X - (dimensions?.width ?? 1) / 2,
+    top: coordinatesOfCursor.Y - (dimensions?.height ?? 1) / 2,
   };
 
   const additionalStyles: React.CSSProperties = isCurrent
     ? {
         position: "absolute",
         cursor: "grabbing",
+        width: (initialDimensions?.width ?? 1) - 40,
+        zIndex: 20000,
       }
     : { cursor: "grab" };
 
@@ -70,8 +57,23 @@ const Drag = (props: DragProps) => {
     ...additionalStyles,
   };
 
+  const isOver = currentOver === props.id;
+
   useEffect(() => {
     updateElementDimensions();
+  }, [coordinatesOfCursor]);
+
+  useEffect(() => {
+    if (currentActive === "") return;
+
+    if (
+      isPointInsideElement(
+        coordinatesOfCursor,
+        container.current?.getBoundingClientRect()
+      )
+    ) {
+      setCurrentOver(props.id);
+    }
   }, [coordinatesOfCursor]);
 
   useEffect(() => {
@@ -91,13 +93,15 @@ const Drag = (props: DragProps) => {
 
   return (
     <>
-      <div ref={container}>
+      <div
+        onContextMenu={(e) => {
+          e.preventDefault();
+        }}
+        ref={container}
+      >
+        <div style={{ width: "100%", height: 2 }}></div>
         <motion.div
-          animate={{
-            left: coordinatesOfCursor.X,
-            top: coordinatesOfCursor.Y,
-          }}
-          transition={{ duration: 0.05 }}
+          transition={{ duration: 0.5 }}
           ref={ref}
           onMouseDown={(e) => {
             e.preventDefault();
@@ -107,16 +111,17 @@ const Drag = (props: DragProps) => {
           onTouchStart={(e) => {
             e.preventDefault();
             setCoordinatesOfCursor({
-              X: e.targetTouches[0].clientX - 10,
-              Y: e.targetTouches[0].clientY - 10,
+              X: e.targetTouches[0].clientX,
+              Y: e.targetTouches[0].clientY,
             });
             setCurrentActive(props.id);
           }}
           style={styling}
         >
+          {JSON.stringify(dimensions?.width)}
           {props.children}
         </motion.div>
-        {currentActive !== "" ? (
+        {currentActive !== "" && isOver ? (
           <motion.div
             ref={placeholder}
             initial={{
@@ -127,17 +132,18 @@ const Drag = (props: DragProps) => {
               opacity: 1,
               transition: {
                 height: {
-                  duration: 0.1,
+                  duration: 0.15,
                 },
                 opacity: {
-                  duration: 0.25,
-                  delay: 0.15,
+                  duration: 0.1,
                 },
               },
+              borderColor: "#b2bec3",
+              borderRadius: 4,
               borderStyle: "dashed",
               height: initialDimensions?.height,
               width: initialDimensions?.width,
-              backgroundColor: isOver ? "red" : "gray",
+              backgroundColor: isOver ? "#b2bec3" : "#dfe6e9",
             }}
           >
             {props.id}

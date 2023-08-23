@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 
 export interface ICoordinates {
   X: number;
@@ -52,10 +52,10 @@ export default function DragContext(props: IDragInterface) {
   };
 
   document.ontouchmove = (e) => {
-    console.log(e);
+    e.preventDefault();
     if (currentActive !== "") {
       let { pageX: x, pageY: y } = e.targetTouches[0];
-      setCoordinatesOfCursor({ X: x - 10, Y: y - 10 });
+      setCoordinatesOfCursor({ X: x, Y: y });
     }
   };
 
@@ -65,6 +65,7 @@ export default function DragContext(props: IDragInterface) {
         JSON.stringify({ active: currentActive, over: currentOver })
       );
       setCurrentActive("");
+      setCurrentOver("");
       props.onDragEnd(retValues.active, retValues.over);
     }
   };

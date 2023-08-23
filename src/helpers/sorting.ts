@@ -1,5 +1,7 @@
 export function move(idToMove: any, idToInsertAfter: any, items: Array<any>) {
   if (isEmpty(idToMove, idToInsertAfter, items)) return items;
+  if (idToMove === idToInsertAfter) return items;
+
   items = JSON.parse(JSON.stringify(items));
 
   // Find the index of the element with the given ID
@@ -19,11 +21,7 @@ export function move(idToMove: any, idToInsertAfter: any, items: Array<any>) {
     if (indexOfElementToInsertAfter !== -1) {
       // Insert the item after the identified element
       items.splice(indexOfElementToInsertAfter + 1, 0, itemToMove);
-    } else {
-      console.log("ID to insert after not found in the array.");
     }
-  } else {
-    console.log("ID to move not found in the array.");
   }
 
   // Output the updated array
