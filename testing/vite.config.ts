@@ -7,5 +7,5 @@ export default defineConfig({
   server: {
     host: true,
   },
-  base: "https://temannin.github.io/",
+  base: "https://temannin.github.io/react-drag/",
 });
