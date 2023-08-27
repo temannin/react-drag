@@ -20,15 +20,10 @@ const Drag = (props: DragProps) => {
 
   const ref = useRef<HTMLDivElement>(null);
   const placeholder = useRef<HTMLDivElement>(null);
+  const topPlaceholder = useRef<HTMLDivElement>(null);
   const container = useRef<HTMLDivElement>(null);
 
   const isCurrent = props.id === currentActive;
-
-  const updateElementDimensions = () => {
-    if (ref.current) {
-      setDimensions(ref.current.getBoundingClientRect());
-    }
-  };
 
   const [dimensions, setDimensions] = useState<DOMRect>();
   const [initialDimensions, setInitialDimensions] = useState<DOMRect>();
@@ -39,7 +34,6 @@ const Drag = (props: DragProps) => {
     margin: 4,
     padding: "18px 20px",
     backgroundColor: "#fff",
-    // left: coordinatesOfCursor.X - (dimensions?.width ?? 1) / 2,
     top: coordinatesOfCursor.Y - (dimensions?.height ?? 1) / 2,
   };
 
@@ -55,6 +49,12 @@ const Drag = (props: DragProps) => {
   const styling: React.CSSProperties = {
     ...commonStyles,
     ...additionalStyles,
+  };
+
+  const updateElementDimensions = () => {
+    if (ref.current) {
+      setDimensions(ref.current.getBoundingClientRect());
+    }
   };
 
   const isOver = currentOver === props.id;
@@ -99,7 +99,34 @@ const Drag = (props: DragProps) => {
         }}
         ref={container}
       >
-        <div style={{ width: "100%", height: 2 }}></div>
+        {currentActive !== "" && isOver ? (
+          <motion.div
+            ref={topPlaceholder}
+            initial={{
+              height: 0,
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+              transition: {
+                height: {
+                  duration: 0.15,
+                },
+                opacity: {
+                  duration: 0.1,
+                },
+              },
+              borderColor: "#b2bec3",
+              borderRadius: 4,
+              borderStyle: "dashed",
+              height: initialDimensions?.height,
+              width: initialDimensions?.width,
+              backgroundColor: isOver ? "#b2bec3" : "#dfe6e9",
+            }}
+          >
+            {props.id}
+          </motion.div>
+        ) : null}
         <motion.div
           transition={{ duration: 0.5 }}
           ref={ref}
